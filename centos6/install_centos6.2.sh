@@ -42,7 +42,9 @@ user --name=hnakamur --password=password --uid=500
 
 %packages --nobase
 @core
+file
 man
+openssh-clients
 %end
 
 %post
@@ -63,7 +65,7 @@ PermitRootLogin no
 /^X11Forwarding yes/d
 ' /etc/ssh/sshd_config
 
-cat <<SUDOERS_EOF > /etc/sudoers
+cat >>/etc/sudoers <<SUDOERS_EOF 
 
 hnakamur ALL=(ALL)      NOPASSWD: ALL
 SUDOERS_EOF
