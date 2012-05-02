@@ -67,6 +67,7 @@ PermitRootLogin no
 
 cat >>/etc/sudoers <<SUDOERS_EOF 
 
+Defaults:hnakamur !requiretty
 hnakamur ALL=(ALL)      NOPASSWD: ALL
 SUDOERS_EOF
 EOF
