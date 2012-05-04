@@ -13,6 +13,22 @@ cat > /etc/chef/solo.rb <<EOF
 file_cache_path '/tmp/chef-solo'
 cookbook_path   '/etc/chef/site-cookbooks'
 node_name       \`hostname\`.chomp
+log_location    '/var/log/chef/solo.log'
+EOF
+
+mkdir -p /var/log/chef/old
+cat > /etc/logrotate.d/nginx <<EOF
+/var/log/chef/*.log {
+    daily
+    missingok
+    rotate 90
+    compress
+    delaycompress
+    notifempty
+    sharedscripts
+    dateext
+    olddir /var/log/chef/old/
+}
 EOF
 
 mkdir /root/.chef
