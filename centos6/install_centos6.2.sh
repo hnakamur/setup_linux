@@ -42,12 +42,16 @@ user --name=hnakamur --password=password --uid=500
 
 %packages --nobase
 @core
+bind-utils
 file
 git
 man
 openssh-clients
+patch
 rsync
 screen
+sysstat
+traceroute
 vim-enhanced
 wget
 %end
