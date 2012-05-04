@@ -77,6 +77,7 @@ PermitRootLogin no
 
 cat >/etc/sudoers.d/hnakamur <<SUDOERS_EOF &&
 Defaults:hnakamur !requiretty
+Defaults:hnakamur secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 hnakamur ALL=(ALL)      NOPASSWD: ALL
 SUDOERS_EOF
 chmod 0440 /etc/sudoers.d/hnakamur
