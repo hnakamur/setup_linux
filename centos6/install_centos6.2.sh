@@ -30,7 +30,7 @@ selinux --disabled
 timezone --utc Asia/Tokyo
 bootloader --location=mbr --driveorder=vda --append=" crashkernel=auto console=ttyS0,115200n8"
 
-clearpart --all --drives=vda
+clearpart --all --initlabel --drives=vda
 part /boot --fstype=ext4 --size=500
 part pv.0 --grow --size=1
 volgroup VolGroup pv.0
