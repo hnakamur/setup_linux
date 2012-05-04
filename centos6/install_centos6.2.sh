@@ -45,6 +45,8 @@ user --name=hnakamur --password=password --uid=500
 file
 man
 openssh-clients
+vim-enhanced
+wget
 %end
 
 %post
