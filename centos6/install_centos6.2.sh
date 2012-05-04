@@ -43,6 +43,7 @@ user --name=hnakamur --password=password --uid=500
 %packages --nobase
 @core
 file
+git
 man
 openssh-clients
 rsync
