@@ -39,6 +39,7 @@ logvol / --fstype=ext4 --name=lv_root --vgname=VolGroup --grow --size=1024 --max
 
 repo --name="CentOS"  --baseurl=${location_url} --cost=100
 user --name=hnakamur --password=password --uid=500
+reboot
 
 %packages --nobase
 @core
