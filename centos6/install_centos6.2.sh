@@ -47,6 +47,7 @@ git
 man
 openssh-clients
 rsync
+screen
 vim-enhanced
 wget
 %end
