@@ -59,13 +59,13 @@ wget
 
 %post
 
-mkdir /home/hnakamur/.ssh
-chmod 700 /home/hnakamur/.ssh
-cat <<KEY_EOF > /home/hnakamur/.ssh/authorized_keys
+mkdir /home/hnakamur/.ssh &&
+chmod 700 /home/hnakamur/.ssh &&
+cat <<KEY_EOF > /home/hnakamur/.ssh/authorized_keys &&
 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAokqmX07JuL5EhDr9EHR6jhNKV0Im5l8Wv/F343NJs1X4qoKtvcixTTyl+BLNtczOLUbyzqVpCOjWIs2hDwYyrounFVw/+TM2abp4pFUgB6qnDY7T+8kSKw3mSAIjDt4rZIkuizzRonGsTkjw8hBT5OokUSR68xVcwaphdcu8ZvHp8/Um5+6eay4D1S0pDOEvf6FEhADDr1c10IPGwsCOpLcxSHCkVFOkZzmgSTSt/7BlX90278oyDOjIKEqisSwi0HaHWvsJ1C3WUtDFVpR85+rH70mt5UH2DbPfZ9W2to+Pgh7nNg95CO6H0geH1tWejS0yQ4ZE0EOKYuFaiPdMVQ== hnakamur@sunshine103
 KEY_EOF
-chmod 600 /home/hnakamur/.ssh/authorized_keys
-chown -R hnakamur:hnakamur /home/hnakamur/.ssh
+chmod 600 /home/hnakamur/.ssh/authorized_keys &&
+chown -R hnakamur:hnakamur /home/hnakamur/.ssh &&
 
 sed -i.orig -e '
 s/^PasswordAuthentication yes/PasswordAuthentication no/
@@ -73,9 +73,9 @@ s/^PasswordAuthentication yes/PasswordAuthentication no/
 /^#PermitRootLogin yes/a\
 PermitRootLogin no
 /^X11Forwarding yes/d
-' /etc/ssh/sshd_config
+' /etc/ssh/sshd_config &&
 
-cat >/etc/sudoers.d/hnakamur <<SUDOERS_EOF 
+cat >/etc/sudoers.d/hnakamur <<SUDOERS_EOF &&
 Defaults:hnakamur !requiretty
 hnakamur ALL=(ALL)      NOPASSWD: ALL
 SUDOERS_EOF
@@ -86,13 +86,13 @@ EOF
 }
 
 make_ksfdimg() {
-  workdir=/tmp/makeksfd.$$
-  dd if=/dev/zero of=$ksfdimg bs=1440K count=1 > /dev/null 2>&1
-  /sbin/mkfs -F -t ext2 $ksfdimg > /dev/null 2>&1
-  mkdir $workdir
-  sudo mount -o loop $ksfdimg $workdir
-  cp -p $ksfile $workdir/ks.cfg
-  sudo umount $workdir
+  workdir=/tmp/makeksfd.$$ &&
+  dd if=/dev/zero of=$ksfdimg bs=1440K count=1 > /dev/null 2>&1 &&
+  /sbin/mkfs -F -t ext2 $ksfdimg > /dev/null 2>&1 &&
+  mkdir $workdir &&
+  sudo mount -o loop $ksfdimg $workdir &&
+  cp -p $ksfile $workdir/ks.cfg &&
+  sudo umount $workdir &&
   rm -rf $workdir
 }
 
@@ -116,6 +116,6 @@ run_virt_install() {
 #ERROR    Only one install method can be used (--location URL, --cdrom CD/ISO, --pxe, --import, --boot hd|cdrom|...)
 }
 
-make_ksfile
-make_ksfdimg
+make_ksfile &&
+make_ksfdimg &&
 run_virt_install
