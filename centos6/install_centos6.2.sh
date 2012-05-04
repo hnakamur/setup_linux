@@ -80,6 +80,8 @@ Defaults:hnakamur !requiretty
 hnakamur ALL=(ALL)      NOPASSWD: ALL
 SUDOERS_EOF
 chmod 0440 /etc/sudoers.d/hnakamur
+
+yum -y update
 EOF
 }
 
