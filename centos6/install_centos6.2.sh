@@ -45,6 +45,7 @@ user --name=hnakamur --password=password --uid=500
 file
 man
 openssh-clients
+rsync
 vim-enhanced
 wget
 %end
