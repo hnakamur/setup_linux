@@ -74,11 +74,11 @@ PermitRootLogin no
 /^X11Forwarding yes/d
 ' /etc/ssh/sshd_config
 
-cat >>/etc/sudoers <<SUDOERS_EOF 
-
+cat >/etc/sudoers.d/hnakamur <<SUDOERS_EOF 
 Defaults:hnakamur !requiretty
 hnakamur ALL=(ALL)      NOPASSWD: ALL
 SUDOERS_EOF
+chmod 0440 /etc/sudoers.d/hnakamur
 EOF
 }
 
