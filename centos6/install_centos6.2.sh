@@ -137,4 +137,5 @@ run_virt_install() {
 
 make_ksfile &&
 make_ksfdimg &&
-run_virt_install
+run_virt_install &&
+rm $ksfile $ksfdimg
