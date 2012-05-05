@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#location_url=http://ftp.riken.jp/Linux/centos/6.2/os/x86_64/
-location_url=http://ftp.kddilabs.jp/Linux/packages/CentOS/6.2/os/x86_64/
-
 if [ $# -ne 2 ]; then
   echo Usage $0 hostname ipaddress
   exit 1
@@ -11,21 +8,29 @@ fi
 hostname=$1
 ipaddress=$2
 
-ksfile=/tmp/$hostname-ks.cfg.$$
-ksfdimg=/tmp/$hostname-ks.img.$$
-
+# Common configs
+netmask=255.255.255.0
+gateway=192.168.11.1 
+nameserver=192.168.11.1
+location_url=http://ftp.riken.jp/Linux/centos/6.2/os/x86_64/
+#location_url=http://ftp.kddilabs.jp/Linux/packages/CentOS/6.2/os/x86_64/
 # NOTE: You can use /sbin/grub-md-crypt to get encrypted password.
 root_encrypted_pw='$1$AvrTd0$NNXNpu5JYHNNG6JMnRSI7/'
 user_encrypted_pw='$1$xyuTd0$XVWYOPm2bdQzlpulmYDqM1'
+user_loginid=hnakamur
+user_pubkey='ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAokqmX07JuL5EhDr9EHR6jhNKV0Im5l8Wv/F343NJs1X4qoKtvcixTTyl+BLNtczOLUbyzqVpCOjWIs2hDwYyrounFVw/+TM2abp4pFUgB6qnDY7T+8kSKw3mSAIjDt4rZIkuizzRonGsTkjw8hBT5OokUSR68xVcwaphdcu8ZvHp8/Um5+6eay4D1S0pDOEvf6FEhADDr1c10IPGwsCOpLcxSHCkVFOkZzmgSTSt/7BlX90278oyDOjIKEqisSwi0HaHWvsJ1C3WUtDFVpR85+rH70mt5UH2DbPfZ9W2to+Pgh7nNg95CO6H0geH1tWejS0yQ4ZE0EOKYuFaiPdMVQ== hnakamur@sunshine103'
+
+ksfile=/tmp/$hostname-ks.cfg.$$
+ksfdimg=/tmp/$hostname-ks.img.$$
 
 make_ksfile() {
   cat <<EOF > $ksfile
 install
-url --url=http://ftp.riken.jp/Linux/centos/6.2/os/x86_64/
+url --url=${location_url}
 lang en_US.UTF-8
 keyboard us
 #network --onboot yes --device eth0 --bootproto dhcp --noipv6
-network --device eth0 --bootproto static --ip ${ipaddress} --netmask 255.255.255.0 --gateway 192.168.11.1 --nameserver 192.168.11.1 --hostname ${hostname}
+network --device eth0 --bootproto static --ip ${ipaddress} --netmask ${netmask} --gateway ${gateway} --nameserver ${nameserver} --hostname ${hostname}
 rootpw --iscrypted $root_encrypted_pw
 firewall --service=ssh
 authconfig --enableshadow --passalgo=sha512
@@ -41,7 +46,7 @@ logvol swap --name=lv_swap --vgname=VolGroup --grow --size=1008 --maxsize=2016
 logvol / --fstype=ext4 --name=lv_root --vgname=VolGroup --grow --size=1024 --maxsize=51200
 
 repo --name="CentOS"  --baseurl=${location_url} --cost=100
-user --name=hnakamur --password=$user_encrypted_pw --iscrypted --uid=500
+user --name=${user_loginid} --password=$user_encrypted_pw --iscrypted --uid=500
 reboot
 
 %packages --nobase
@@ -62,13 +67,13 @@ wget
 
 %post
 
-mkdir /home/hnakamur/.ssh &&
-chmod 700 /home/hnakamur/.ssh &&
-cat <<KEY_EOF > /home/hnakamur/.ssh/authorized_keys &&
-ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAokqmX07JuL5EhDr9EHR6jhNKV0Im5l8Wv/F343NJs1X4qoKtvcixTTyl+BLNtczOLUbyzqVpCOjWIs2hDwYyrounFVw/+TM2abp4pFUgB6qnDY7T+8kSKw3mSAIjDt4rZIkuizzRonGsTkjw8hBT5OokUSR68xVcwaphdcu8ZvHp8/Um5+6eay4D1S0pDOEvf6FEhADDr1c10IPGwsCOpLcxSHCkVFOkZzmgSTSt/7BlX90278oyDOjIKEqisSwi0HaHWvsJ1C3WUtDFVpR85+rH70mt5UH2DbPfZ9W2to+Pgh7nNg95CO6H0geH1tWejS0yQ4ZE0EOKYuFaiPdMVQ== hnakamur@sunshine103
+mkdir /home/${user_loginid}/.ssh &&
+chmod 700 /home/${user_loginid}/.ssh &&
+cat <<KEY_EOF > /home/${user_loginid}/.ssh/authorized_keys &&
+$user_pubkey
 KEY_EOF
-chmod 600 /home/hnakamur/.ssh/authorized_keys &&
-chown -R hnakamur:hnakamur /home/hnakamur/.ssh &&
+chmod 600 /home/${user_loginid}/.ssh/authorized_keys &&
+chown -R ${user_loginid}:${user_loginid} /home/${user_loginid}/.ssh &&
 
 sed -i.orig -e '
 s/^PasswordAuthentication yes/PasswordAuthentication no/
@@ -82,11 +87,11 @@ sed -i.orig -e '/^## Read drop-in files from \/etc\/sudoers.d (the # here does n
 /^#includedir \/etc\/sudoers\.d$/{s/.*//
 a# Per-user configs\\\
 
-Defaults:hnakamur !requiretty\\\
+Defaults:${user_loginid} !requiretty\\\
 
-Defaults:hnakamur secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\\\
+Defaults:${user_loginid} secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\\\
 
-hnakamur ALL=(ALL) NOPASSWD: ALL
+${user_loginid} ALL=(ALL) NOPASSWD: ALL
 }' /etc/sudoers &&
 
 yum -y update
