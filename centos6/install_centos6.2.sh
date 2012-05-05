@@ -20,6 +20,11 @@ user_encrypted_pw='$1$xyuTd0$XVWYOPm2bdQzlpulmYDqM1'
 user_loginid=hnakamur
 user_pubkey='ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAokqmX07JuL5EhDr9EHR6jhNKV0Im5l8Wv/F343NJs1X4qoKtvcixTTyl+BLNtczOLUbyzqVpCOjWIs2hDwYyrounFVw/+TM2abp4pFUgB6qnDY7T+8kSKw3mSAIjDt4rZIkuizzRonGsTkjw8hBT5OokUSR68xVcwaphdcu8ZvHp8/Um5+6eay4D1S0pDOEvf6FEhADDr1c10IPGwsCOpLcxSHCkVFOkZzmgSTSt/7BlX90278oyDOjIKEqisSwi0HaHWvsJ1C3WUtDFVpR85+rH70mt5UH2DbPfZ9W2to+Pgh7nNg95CO6H0geH1tWejS0yQ4ZE0EOKYuFaiPdMVQ== hnakamur@sunshine103'
 
+disk_path=/var/kvm/images/${hostname}.img
+disk_size=20
+ram_size=1024
+vcpus=2
+
 ksfile=/tmp/$hostname-ks.cfg.$$
 ksfdimg=/tmp/$hostname-ks.img.$$
 
@@ -113,10 +118,10 @@ make_ksfdimg() {
 
 run_virt_install() {
   sudo virt-install -n ${hostname} \
-  -r 1024 \
-  --disk path=/var/kvm/images/${hostname}.img,size=20,device=disk,bus=virtio,format=raw \
+  -r ${ram_size} \
+  --disk path=${disk_path},size=${disk_size},device=disk,bus=virtio,format=raw \
   --disk path=$ksfdimg,device=floppy \
-  --vcpus=2 \
+  --vcpus=${vcpus} \
   --os-type=linux \
   --os-variant=rhel6 \
   --network=bridge=br0,model=virtio \
