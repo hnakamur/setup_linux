@@ -14,6 +14,10 @@ ipaddress=$2
 ksfile=/tmp/$hostname-ks.cfg.$$
 ksfdimg=/tmp/$hostname-ks.img.$$
 
+# NOTE: You can use /sbin/grub-md-crypt to get encrypted password.
+root_encrypted_pw='$1$AvrTd0$NNXNpu5JYHNNG6JMnRSI7/'
+user_encrypted_pw='$1$xyuTd0$XVWYOPm2bdQzlpulmYDqM1'
+
 make_ksfile() {
   cat <<EOF > $ksfile
 install
@@ -22,8 +26,7 @@ lang en_US.UTF-8
 keyboard us
 #network --onboot yes --device eth0 --bootproto dhcp --noipv6
 network --device eth0 --bootproto static --ip ${ipaddress} --netmask 255.255.255.0 --gateway 192.168.11.1 --nameserver 192.168.11.1 --hostname ${hostname}
-#rootpw  --iscrypted $6$9LqCbasGLPao4fBO$IH8yZaPJWsoNLZtMGD5jnwJ.uRq7dbNOpXKkMldZGObS0.8X9dXr3FEC0qBpKj1LjOR6RgGCeRD3rDGe.wZtp0
-rootpw  password
+rootpw --iscrypted $root_encrypted_pw
 firewall --service=ssh
 authconfig --enableshadow --passalgo=sha512
 selinux --disabled
@@ -38,7 +41,7 @@ logvol swap --name=lv_swap --vgname=VolGroup --grow --size=1008 --maxsize=2016
 logvol / --fstype=ext4 --name=lv_root --vgname=VolGroup --grow --size=1024 --maxsize=51200
 
 repo --name="CentOS"  --baseurl=${location_url} --cost=100
-user --name=hnakamur --password=password --uid=500
+user --name=hnakamur --password=$user_encrypted_pw --iscrypted --uid=500
 reboot
 
 %packages --nobase
