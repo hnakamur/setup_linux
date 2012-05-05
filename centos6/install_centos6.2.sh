@@ -75,12 +75,16 @@ PermitRootLogin no
 /^X11Forwarding yes/d
 ' /etc/ssh/sshd_config &&
 
-cat >/etc/sudoers.d/hnakamur <<SUDOERS_EOF &&
-Defaults:hnakamur !requiretty
-Defaults:hnakamur secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-hnakamur ALL=(ALL)      NOPASSWD: ALL
-SUDOERS_EOF
-chmod 0440 /etc/sudoers.d/hnakamur
+sed -i.orig -e '/^## Read drop-in files from \/etc\/sudoers.d (the # here does not mean a comment)$/d
+/^#includedir \/etc\/sudoers\.d$/{s/.*//
+a# Per-user configs\\\
+
+Defaults:hnakamur !requiretty\\\
+
+Defaults:hnakamur secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\\\
+
+hnakamur ALL=(ALL) NOPASSWD: ALL
+}' /etc/sudoers &&
 
 yum -y update
 EOF
