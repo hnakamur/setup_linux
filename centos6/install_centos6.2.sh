@@ -23,6 +23,16 @@ user_pubkey='ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAokqmX07JuL5EhDr9EHR6jhNKV0Im5l8
 ksfile=/tmp/$hostname-ks.cfg.$$
 ksfdimg=/tmp/$hostname-ks.img.$$
 
+cat_sudoers_modify_script() {
+  echo '/^## Read drop-in files from \/etc\/sudoers.d (the # here does not mean a comment)$/d'
+  echo '/^#includedir \/etc\/sudoers\.d$/{s/.*//'
+  echo 'a# Per-user configs\'
+  echo 'Defaults:'${user_loginid}' !requiretty\'
+  echo 'Defaults:'${user_loginid}' secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\'
+  echo ${user_loginid}' ALL=(ALL) NOPASSWD: ALL'
+  echo '}'
+}
+
 make_ksfile() {
   cat <<EOF > $ksfile
 install
@@ -83,16 +93,7 @@ PermitRootLogin no
 /^X11Forwarding yes/d
 ' /etc/ssh/sshd_config &&
 
-sed -i.orig -e '/^## Read drop-in files from \/etc\/sudoers.d (the # here does not mean a comment)$/d
-/^#includedir \/etc\/sudoers\.d$/{s/.*//
-a# Per-user configs\\\
-
-Defaults:${user_loginid} !requiretty\\\
-
-Defaults:${user_loginid} secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\\\
-
-${user_loginid} ALL=(ALL) NOPASSWD: ALL
-}' /etc/sudoers &&
+sed -i.orig -e '`cat_sudoers_modify_script`' /etc/sudoers &&
 
 yum -y update
 EOF
