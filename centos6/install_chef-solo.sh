@@ -110,8 +110,9 @@ EOF
     olddir /var/log/chef/old/
 }
 EOF
+  mkdir /var/chef-solo &&
   cat > /etc/chef/solo.rb <<EOF &&
-file_cache_path '/tmp/chef-solo'
+file_cache_path '/var/chef-solo'
 cookbook_path   '/etc/chef/site-cookbooks'
 node_name       \`hostname\`.chomp
 log_location    '/var/log/chef/solo.log'
