@@ -91,7 +91,7 @@ cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
 cookbook_path            "/etc/chef/site-cookbooks" 
 cookbook_copyright       'Hiroaki Nakamura'
-cookbook_license         'MIT'
+cookbook_license         'mit'
 cookbook_email           'hnakamur@gmail.com'
 environment_path         "#{current_dir}/../environments"
 EOF
