@@ -114,6 +114,7 @@ EOF
   cat > /etc/chef/solo.rb <<EOF &&
 file_cache_path '/var/chef-solo'
 cookbook_path   '/etc/chef/site-cookbooks'
+json_attribs    '/root/node.json'
 node_name       \`hostname\`.chomp
 log_location    '/var/log/chef/solo.log'
 EOF
