@@ -7,16 +7,21 @@ fi
 
 install_epel() {
   if [ ! -f /etc/yum.repos.d/epel.repo ]; then
-    rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/`uname -p`/epel-release-6-5.noarch.rpm
+    rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/`uname -p`/epel-release-6-6.noarch.rpm
   fi
 }
 
-install_ruby1_9() {
+get_ruby19_version() {
+  if which ruby > /dev/null 2>&1; then
+    ruby -v | awk '{sub("p","-p",$2);print $2}'
+  else
+    echo not_installed
+  fi
+}
+
+install_ruby19() {
   ruby_version=1.9.3-p194 &&
-  rubygems_version=1.8.24 &&
-  if ruby_installed_version=`ruby -v | perl -ne \
-      'if (/\Aruby (\d+\.\d+\.\d+)(p\d+)/) {print "$1-$2"}'` &&
-      [ ${ruby_installed_version:-'_'} != $ruby_version ]; then
+  if [ `get_ruby19_version` != $ruby_version ]; then
     install_epel &&
     yum -y install gcc make libxslt-devel libyaml-devel libxml2-devel \
       gdbm-devel libffi-devel zlib-devel openssl-devel libyaml-devel \
@@ -29,22 +34,20 @@ install_ruby1_9() {
     ./configure &&
     make &&
     make install
-  fi &&
-  if rubygems_installed_version=`gem -v` &&
-      [ ${rubygems_installed_version:-'_'} != $rubygems_version ]; then
-    cd /usr/local/src &&
-    curl -LO http://production.cf.rubygems.org/rubygems/rubygems-${rubygems_version}.tgz &&
-    tar xf rubygems-${rubygems_version}.tgz &&
-    cd rubygems-${rubygems_version} &&
-    /usr/local/bin/ruby setup.rb
   fi
 }
 
-install_ruby1_8ee() {
+get_ruby18ee_version() {
+  if which ruby > /dev/null 2>&1; then
+    ruby -v | awk '{print $2"-"$15}'
+  else
+    echo not_installed
+  fi
+}
+
+install_ruby18ee() {
   version=1.8.7-2012.02 &&
-  if installed_version=`ruby -v | perl -ne \
-      'if (/\Aruby (\d+\.\d+\.\d+).*Ruby Enterprise Edition (\d+\.\d+)/) {print "$1-$2"}'` &&
-      [ ${installed_version:-'_'} != $version ]; then
+  if [ `get_ruby18ee_version` != $version ]; then
     yum -y install gcc-c++ patch make readline-devel zlib-devel \
       libyaml-devel libffi-devel openssl-devel curl-devel git &&
     cd /usr/local/src &&
@@ -54,7 +57,7 @@ install_ruby1_8ee() {
   fi
 }
 
-install_ruby1_8() {
+install_ruby18() {
   yum -y install ruby rubygems ruby-devel make gcc
 }
 
@@ -111,7 +114,7 @@ EOF
 }
 EOF
   mkdir /var/chef-solo &&
-  cat > /etc/chef/solo.rb <<EOF &&
+  cat > /etc/chef/solo.rb <<EOF
 file_cache_path '/var/chef-solo'
 cookbook_path   '/etc/chef/site-cookbooks'
 json_attribs    '/root/node.json'
@@ -128,14 +131,14 @@ error_exit() {
 case $1 in
 ruby1.9)
   export PATH=/usr/local/bin:$PATH &&
-  install_ruby1_9
+  install_ruby19
   ;;
 ruby1.8ee)
   export PATH=/usr/local/bin:$PATH &&
-  install_ruby1_8ee
+  install_ruby18ee
   ;;
 ruby1.8)
-  install_ruby1_8
+  install_ruby18
   ;;
 esac &&
 create_gemrc &&
