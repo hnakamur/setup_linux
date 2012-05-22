@@ -26,14 +26,19 @@ install_ruby19() {
     yum -y install gcc make libxslt-devel libyaml-devel libxml2-devel \
       gdbm-devel libffi-devel zlib-devel openssl-devel libyaml-devel \
       readline-devel curl-devel openssl-devel pcre-devel memcached-devel \
-      valgrind-devel mysql-devel &&
-    cd /usr/local/src &&
-    curl -LO http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-${ruby_version}.tar.gz &&
-    tar xf ruby-${ruby_version}.tar.gz &&
-    cd ruby-${ruby_version} &&
-    ./configure &&
-    make &&
-    make install
+      valgrind-devel mysql-devel \
+    rpm-build rpmdevtools ncurses-devel tcl-devel db4-devel byacc &&
+    rpmdev-setuptree &&
+    cd ~/rpmbuild/SOURCES &&
+    wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p194.tar.gz &&
+    cd ~/rpmbuild/SPECS &&
+    wget https://raw.github.com/imeyer/ruby-1.9.3-rpm/master/ruby19.spec &&
+    rpmbuild -bb ruby19.spec &&
+    ARCH=`uname -m` &&
+    KERNEL_REL=`uname -r` &&
+    KERNEL_TMP=${KERNEL_REL%.$ARCH} &&
+    DISTRIB=${KERNEL_TMP##*.} &&
+    rpm -Uvh ~/rpmbuild/RPMS/${ARCH}/ruby-1.9.3p194-1.${DISTRIB}.${ARCH}.rpm
   fi
 }
 
