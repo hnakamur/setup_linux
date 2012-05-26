@@ -34,6 +34,7 @@ cat_sudoers_modify_script() {
   echo 'a# Per-user configs\'
   echo 'Defaults:'${user_loginid}' !requiretty\'
   echo 'Defaults:'${user_loginid}' secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\'
+  echo 'Defaults:'${user_loginid}' env_keep += "VIMINIT"'
   echo ${user_loginid}' ALL=(ALL) NOPASSWD: ALL'
   echo '}'
 }
@@ -89,6 +90,9 @@ $user_pubkey
 KEY_EOF
 chmod 600 /home/${user_loginid}/.ssh/authorized_keys &&
 chown -R ${user_loginid}:${user_loginid} /home/${user_loginid}/.ssh &&
+
+echo "export VIMINIT='set sw=2 ts=2 et'" \
+  >> /home/${user_loginid}/.bash_profile &&
 
 sed -i.orig -e '
 s/^PasswordAuthentication yes/PasswordAuthentication no/
