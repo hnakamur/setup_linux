@@ -70,6 +70,8 @@ which
 
 %post --log=/root/kickstart-post.log
 
+sed -i -e 's/\(^SELINUX=\).*$/\1disabled/' /etc/selinux/config &&
+
 mkdir /home/${user_loginid}/.ssh &&
 chmod 700 /home/${user_loginid}/.ssh &&
 cat <<KEY_EOF > /home/${user_loginid}/.ssh/authorized_keys &&
