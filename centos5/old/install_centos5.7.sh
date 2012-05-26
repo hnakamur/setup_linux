@@ -59,7 +59,14 @@ reboot
 
 %packages --nobase
 @core
+bind-utils
+man
 sudo
+sysstat
+traceroute
+vim-enhanced
+wget
+which
 
 %post --log=/root/kickstart-post.log
 
