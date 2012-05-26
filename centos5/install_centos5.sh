@@ -59,7 +59,9 @@ reboot
 %packages --nobase
 @core
 bind-utils
+curl
 man
+patch
 sudo
 sysstat
 traceroute
