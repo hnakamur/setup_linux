@@ -7,7 +7,7 @@ fi
 
 install_epel() {
   if [ ! -f /etc/yum.repos.d/epel.repo ]; then
-    rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/`uname -p`/epel-release-6-6.noarch.rpm
+    rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/`uname -p`/epel-release-6-7.noarch.rpm
   fi
 }
 
