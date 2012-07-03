@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-  echo "Usage: $0 (ruby1.9|ruby1.8ee|ruby1.8)" 1>&2
-  exit 1
-fi
-
 install_epel() {
   if [ ! -f /etc/yum.repos.d/epel.repo ]; then
     rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/`uname -p`/epel-release-6-7.noarch.rpm
@@ -35,30 +30,6 @@ install_ruby19() {
     make &&
     make install
   fi
-}
-
-get_ruby18ee_version() {
-  if which ruby > /dev/null 2>&1; then
-    ruby -v | awk '{print $2"-"$15}'
-  else
-    echo not_installed
-  fi
-}
-
-install_ruby18ee() {
-  version=1.8.7-2012.02 &&
-  if [ `get_ruby18ee_version` != $version ]; then
-    yum -y install gcc-c++ patch make readline-devel zlib-devel \
-      libyaml-devel libffi-devel openssl-devel curl-devel git &&
-    cd /usr/local/src &&
-    curl -LO http://rubyenterpriseedition.googlecode.com/files/ruby-enterprise-${version}.tar.gz &&
-    tar xf ruby-enterprise-${version}.tar.gz &&
-    ruby-enterprise-${version}/installer --dont-install-useful-gems --no-dev-docs -a /usr/local
-  fi
-}
-
-install_ruby18() {
-  yum -y install ruby rubygems ruby-devel make gcc
 }
 
 create_gemrc() {
@@ -123,25 +94,9 @@ log_location    '/var/log/chef/solo.log'
 EOF
 }
 
-error_exit() {
-  echo $1 1>&2
-  exit 1
-}
-
-case $1 in
-ruby1.9)
-  export PATH=/usr/local/bin:$PATH &&
-  install_ruby19
-  ;;
-ruby1.8ee)
-  export PATH=/usr/local/bin:$PATH &&
-  install_ruby18ee
-  ;;
-ruby1.8)
-  install_ruby18
-  ;;
-esac &&
+export PATH=/usr/local/bin:$PATH &&
+install_ruby19 &&
 create_gemrc &&
-install_chef_solo || error_exit 'failed'
+install_chef_solo &&
 echo 'Done!'
 exit 0
