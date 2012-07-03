@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cookbook_copyright='Hiroaki Nakamura'
+cookbook_email=hnakamur@gmail.com
+
 install_epel() {
   if [ ! -f /etc/yum.repos.d/epel.repo ]; then
     rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/`uname -p`/epel-release-6-7.noarch.rpm
@@ -64,9 +67,9 @@ chef_server_url          ''
 cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
 cookbook_path            "/etc/chef/site-cookbooks" 
-cookbook_copyright       'Hiroaki Nakamura'
+cookbook_copyright       '$cookbook_copyright'
 cookbook_license         'mit'
-cookbook_email           'hnakamur@gmail.com'
+cookbook_email           '$coookbook_email'
 environment_path         "#{current_dir}/../environments"
 EOF
   knife kitchen /etc/chef &&
@@ -97,6 +100,4 @@ EOF
 export PATH=/usr/local/bin:$PATH &&
 install_ruby19 &&
 create_gemrc &&
-install_chef_solo &&
-echo 'Done!'
-exit 0
+install_chef_solo
