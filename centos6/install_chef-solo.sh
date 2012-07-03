@@ -100,7 +100,7 @@ environment_path         "#{current_dir}/../environments"
 EOF
   knife kitchen /etc/chef &&
   mkdir -p /var/log/chef/old &&
-  cat > /etc/logrotate.d/nginx <<EOF &&
+  cat > /etc/logrotate.d/chef <<EOF &&
 /var/log/chef/*.log {
     daily
     missingok
