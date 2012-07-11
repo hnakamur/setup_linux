@@ -90,7 +90,7 @@ EOF
   mkdir /var/chef-solo &&
   cat > /etc/chef/solo.rb <<EOF
 file_cache_path '/var/chef-solo'
-cookbook_path   '/etc/chef/site-cookbooks'
+cookbook_path   '/etc/chef/cookbooks'
 json_attribs    '/root/node.json'
 node_name       \`hostname\`.chomp
 log_location    '/var/log/chef/solo.log'
