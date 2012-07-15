@@ -1,9 +1,7 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-  echo "Usage: $0 (ruby1.9|ruby1.8ee|ruby1.8)" 1>&2
-  exit 1
-fi
+cookbook_copyright='Hiroaki Nakamura'
+cookbook_email=hnakamur@gmail.com
 
 install_epel() {
   if [ ! -f /etc/yum.repos.d/epel.repo ]; then
@@ -35,30 +33,6 @@ install_ruby19() {
     make &&
     make install
   fi
-}
-
-get_ruby18ee_version() {
-  if which ruby > /dev/null 2>&1; then
-    ruby -v | awk '{print $2"-"$15}'
-  else
-    echo not_installed
-  fi
-}
-
-install_ruby18ee() {
-  version=1.8.7-2012.02 &&
-  if [ `get_ruby18ee_version` != $version ]; then
-    yum -y install gcc-c++ patch make readline-devel zlib-devel \
-      libyaml-devel libffi-devel openssl-devel curl-devel git &&
-    cd /usr/local/src &&
-    curl -LO http://rubyenterpriseedition.googlecode.com/files/ruby-enterprise-${version}.tar.gz &&
-    tar xf ruby-enterprise-${version}.tar.gz &&
-    ruby-enterprise-${version}/installer --dont-install-useful-gems --no-dev-docs -a /usr/local
-  fi
-}
-
-install_ruby18() {
-  yum -y install ruby rubygems ruby-devel make gcc
 }
 
 create_gemrc() {
@@ -93,14 +67,14 @@ chef_server_url          ''
 cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
 cookbook_path            "/etc/chef/site-cookbooks" 
-cookbook_copyright       'Hiroaki Nakamura'
+cookbook_copyright       '$cookbook_copyright'
 cookbook_license         'mit'
-cookbook_email           'hnakamur@gmail.com'
+cookbook_email           '$coookbook_email'
 environment_path         "#{current_dir}/../environments"
 EOF
   knife kitchen /etc/chef &&
   mkdir -p /var/log/chef/old &&
-  cat > /etc/logrotate.d/nginx <<EOF &&
+  cat > /etc/logrotate.d/chef <<EOF &&
 /var/log/chef/*.log {
     daily
     missingok
@@ -116,32 +90,14 @@ EOF
   mkdir /var/chef-solo &&
   cat > /etc/chef/solo.rb <<EOF
 file_cache_path '/var/chef-solo'
-cookbook_path   '/etc/chef/site-cookbooks'
+cookbook_path   '/etc/chef/cookbooks'
 json_attribs    '/root/node.json'
 node_name       \`hostname\`.chomp
 log_location    '/var/log/chef/solo.log'
 EOF
 }
 
-error_exit() {
-  echo $1 1>&2
-  exit 1
-}
-
-case $1 in
-ruby1.9)
-  export PATH=/usr/local/bin:$PATH &&
-  install_ruby19
-  ;;
-ruby1.8ee)
-  export PATH=/usr/local/bin:$PATH &&
-  install_ruby18ee
-  ;;
-ruby1.8)
-  install_ruby18
-  ;;
-esac &&
+export PATH=/usr/local/bin:$PATH &&
+install_ruby19 &&
 create_gemrc &&
-install_chef_solo || error_exit 'failed'
-echo 'Done!'
-exit 0
+install_chef_solo
