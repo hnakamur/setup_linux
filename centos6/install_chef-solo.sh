@@ -94,6 +94,7 @@ cookbook_path   '/etc/chef/cookbooks'
 json_attribs    '/root/node.json'
 node_name       \`hostname\`.chomp
 log_location    '/var/log/chef/solo.log'
+log_debug       :debug
 EOF
 }
 
