@@ -12,8 +12,8 @@ ipaddress=$2
 netmask=255.255.255.0
 gateway=192.168.11.1 
 nameserver=192.168.11.1
-location_url=http://ftp.riken.jp/Linux/centos/6.2/os/x86_64/
-#location_url=http://ftp.kddilabs.jp/Linux/packages/CentOS/6.2/os/x86_64/
+location_url=http://ftp.riken.jp/Linux/centos/6.3/os/x86_64/
+#location_url=http://ftp.kddilabs.jp/Linux/packages/CentOS/6.3/os/x86_64/
 # NOTE: You can use /sbin/grub-md-crypt to get encrypted password.
 root_encrypted_pw='$1$AvrTd0$NNXNpu5JYHNNG6JMnRSI7/'
 user_encrypted_pw='$1$xyuTd0$XVWYOPm2bdQzlpulmYDqM1'
@@ -27,17 +27,6 @@ vcpus=2
 
 ksfile=/tmp/$hostname-ks.cfg.$$
 ksfdimg=/tmp/$hostname-ks.img.$$
-
-cat_sudoers_modify_script() {
-  echo '/^## Read drop-in files from \/etc\/sudoers.d (the # here does not mean a comment)$/d'
-  echo '/^#includedir \/etc\/sudoers\.d$/{s/.*//'
-  echo 'a# Per-user configs\'
-  echo 'Defaults:'${user_loginid}' !requiretty\'
-  echo 'Defaults:'${user_loginid}' secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\'
-  echo 'Defaults:'${user_loginid}' env_keep += "VIMINIT"'
-  echo ${user_loginid}' ALL=(ALL) NOPASSWD: ALL'
-  echo '}'
-}
 
 make_ksfile() {
   cat <<EOF > $ksfile
@@ -102,7 +91,13 @@ PermitRootLogin no
 /^X11Forwarding yes/d
 ' /etc/ssh/sshd_config &&
 
-sed -i.orig -e '`cat_sudoers_modify_script`' /etc/sudoers &&
+cat >> /etc/sudoers <<EOF_SUDOERS &&
+# Per-user configs
+Defaults:${user_loginid} !requiretty
+Defaults:${user_loginid} secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+Defaults:${user_loginid} env_keep += "VIMINIT"
+${user_loginid} ALL=(ALL) NOPASSWD: ALL
+EOF_SUDOERS
 
 yum -y update
 EOF
@@ -134,7 +129,7 @@ run_virt_install() {
   --location=$location_url
 
 # Cannot use --cdrom option.
-#  --cdrom=CentOS-6.2-x86_64-minimal.iso \
+#  --cdrom=CentOS-6.3-x86_64-minimal.iso \
 #ERROR    --extra-args only work if specified with --location.
 #ERROR    Only one install method can be used (--location URL, --cdrom CD/ISO, --pxe, --import, --boot hd|cdrom|...)
 }
