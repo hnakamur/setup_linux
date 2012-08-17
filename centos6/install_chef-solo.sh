@@ -1,39 +1,8 @@
 #!/bin/bash
 
 cookbook_copyright='Hiroaki Nakamura'
+cookbook_license=mit
 cookbook_email=hnakamur@gmail.com
-
-install_epel() {
-  if [ ! -f /etc/yum.repos.d/epel.repo ]; then
-    rpm -ivh http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/`uname -p`/epel-release-6-7.noarch.rpm
-  fi
-}
-
-get_ruby19_version() {
-  if which ruby > /dev/null 2>&1; then
-    ruby -v | awk '{sub("p","-p",$2);print $2}'
-  else
-    echo not_installed
-  fi
-}
-
-install_ruby19() {
-  ruby_version=1.9.3-p194 &&
-  if [ `get_ruby19_version` != $ruby_version ]; then
-    install_epel &&
-    yum -y install gcc make libxslt-devel libyaml-devel libxml2-devel \
-      gdbm-devel libffi-devel zlib-devel openssl-devel libyaml-devel \
-      readline-devel curl-devel openssl-devel pcre-devel memcached-devel \
-      valgrind-devel mysql-devel &&
-    cd /usr/local/src &&
-    curl -LO http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-${ruby_version}.tar.gz &&
-    tar xf ruby-${ruby_version}.tar.gz &&
-    cd ruby-${ruby_version} &&
-    ./configure &&
-    make &&
-    make install
-  fi
-}
 
 create_gemrc() {
   if [ ! -f /root/.gemrc ]; then
@@ -49,6 +18,10 @@ install_chef_solo() {
     return 0
   fi &&
   gem install chef knife-solo &&
+  if [ -f /usr/local/rbenv/shims/ruby ]; then
+    # hard link
+    ln /usr/local/rbenv/shims/ruby /usr/local/rbenv/shims/knife
+  fi &&
   mkdir /root/.chef &&
   cat > /root/.chef/knife.rb <<EOF
 # .chef/knife.rb
@@ -66,10 +39,10 @@ validation_key           "#{current_dir}/validation.pem"
 chef_server_url          ''
 cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
-cookbook_path            "/etc/chef/site-cookbooks" 
+cookbook_path            "/etc/chef/cookbooks" 
 cookbook_copyright       '$cookbook_copyright'
-cookbook_license         'mit'
-cookbook_email           '$coookbook_email'
+cookbook_license         '$cookbook_license'
+cookbook_email           '$cookbook_email'
 environment_path         "#{current_dir}/../environments"
 EOF
   knife kitchen /etc/chef &&
@@ -98,7 +71,5 @@ log_debug       :debug
 EOF
 }
 
-export PATH=/usr/local/bin:$PATH &&
-install_ruby19 &&
 create_gemrc &&
 install_chef_solo
