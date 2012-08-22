@@ -1,6 +1,6 @@
 #!/bin/bash
 perlbrew_root=/usr/local/perlbrew
-version=5.16.0
+version=5.16.1
 
 export PERLBREW_ROOT=${perlbrew_root} &&
 curl -kL http://install.perlbrew.pl | bash &&
