@@ -20,7 +20,7 @@ export PATH="$RBENV_ROOT/bin:$PATH"
 eval "$(rbenv init -)"
 EOF
 
-cat >> /root/.bash_profile <<'EOF'
+cat >> /root/.bashrc <<'EOF'
 
 . /usr/local/rbenv/bashrc
 EOF
