@@ -51,7 +51,7 @@ logvol swap --name=lv_swap --vgname=VolGroup --grow --size=1008 --maxsize=2016
 logvol / --fstype=ext4 --name=lv_root --vgname=VolGroup --grow --size=1024 --maxsize=51200
 
 repo --name="CentOS"  --baseurl=${location_url} --cost=100
-user --name=${user_loginid} --password=$user_encrypted_pw --iscrypted --uid=500
+user --name=${user_loginid} --password=$user_encrypted_pw --iscrypted --uid=1000
 reboot
 
 %packages --nobase
