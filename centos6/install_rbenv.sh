@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=1.9.3-p327
+version=1.9.3-p362
 
 yum -y install git gcc make libxslt-devel libxml2-devel \
   gdbm-devel libffi-devel zlib-devel openssl-devel libyaml-devel \
